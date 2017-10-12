@@ -1,64 +1,12 @@
-# clean_assignment
-Assignment for Data Cleaning and Processing
+Getting and Cleaning Data - Course Project
 
-setwd("C:/Users/victor.rotariu/Desktop/workdir/clean/UCI HAR Dataset")
+This is the course project for the Getting and Cleaning Data Coursera course. The R script, run_analysis.R, does the following:
 
-#Script for reading the data assuming working directory is set as the database
-x_test<-read.table("./test/X_test.txt")
-y_test<-read.table("./test/y_test.txt")
-subject_test<-read.table("./test/subject_test.txt")
-x_train<-read.table("./train/X_train.txt")
-y_train<-read.table("./train/y_train.txt")
-subject_train<-read.table("./train/subject_train.txt")
-
-#Merge the train and test data
-data_x<-rbind(x_train, x_test)
-data_y<-rbind(y_train, y_test)
-data_subject<-rbind(subject_train, subject_test)
-data<-cbind(data_x, data_y, data_subject)
-
-#Calculate mean and standard deviation
-getmean <- sapply(data, mean)
-getsd <- sapply(data, sd)
-
-#Assign recognizable name to the dataset
-human_activity_recognition <- data
-
-#Assign recognizable names to the variables
-name<-read.table("./features.txt",stringsAsFactors = F)
-namenew<-strsplit(name[,2],"-")
-
-tt<-NULL
-for(i in 1:502){
-        tt[i]<-paste(namenew[[i]][2],namenew[[i]][1],
-                     "-",namenew[[i]][3],sep="")
-}
-for(i in 503:554){
-        tt[i]<-paste(namenew[[i]][2],namenew[[i]][1],sep="")
-}
-ttt<-NULL
-for(i in 555:561)
-        ttt[i]<-namenew[[i]]
-
-
-t<-chartr("()", "OF", tt)
-dataname<-c(t,ttt[555:561],"labels","subject")
-colnames(human_activity_recognition)<-dataname
-
-human_activity_recognition$subject<-factor(human_activity_recognition$subject)
-
-##Create a tidy dataset with the average of each variable for each activity and each subject
-
-stat<-paste("stat",1:561)
-for(i in 1:561){
-        assign(stat[i],tapply(human_activity_recognition[,i],human_activity_recognition$subject,mean))
-}
-
-statdata<-NULL
-for(i in 1:561){
-        statdata<-rbind(statdata,get(stat[i]))
-}
-rownames(statdata)<-dataname[-c(562,563)]
-
-write.table(statdata,"statdata.txt",quote = F)
-write.table(human_activity_recognition,"Human_Activity_Recognition.txt",quote = F)
+Download the dataset if it does not already exist in the working directory
+Load the activity and feature info
+Loads both the training and test datasets, keeping only those columns which reflect a mean or standard deviation
+Loads the activity and subject data for each dataset, and merges those columns with the dataset
+Merges the two datasets
+Converts the activity and subject columns into factors
+Creates a tidy dataset that consists of the average (mean) value of each variable for each subject and activity pair.
+The end result is shown in the file tidy.txt.
